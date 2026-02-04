@@ -1,0 +1,13 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Credentials (VERY IMPORTANT)
+credentials/
+*.json
+
+# Generated output
+output/
+
+# VS Code (optional)
+.vscode/

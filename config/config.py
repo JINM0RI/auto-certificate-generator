@@ -3,10 +3,10 @@
 # ==============================
 
 # Name or ID of the Google Spreadsheet
-SPREADSHEET_NAME = "participants"
+SPREADSHEET_NAME = "p"
 
 # Worksheet (tab) name inside the spreadsheet
-WORKSHEET_NAME = "Form Responses 1"
+WORKSHEET_NAME = "r"
 
 # Path to Google service account credentials
 CREDENTIALS_FILE = "credentials/service_account.json"
