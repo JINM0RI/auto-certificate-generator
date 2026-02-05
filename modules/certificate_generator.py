@@ -27,4 +27,5 @@ def generate_certificate(name):
     output_path = os.path.join(OUTPUT_DIR, f"{name}.png")
     image.save(output_path)
 
-    print("✅ Certificate generated:", output_path)
+    # print("✅ Certificate generated:", output_path)
+    return output_path

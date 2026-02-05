@@ -11,3 +11,7 @@ output/
 
 # VS Code (optional)
 .vscode/
+
+credentials/
+.env
+
