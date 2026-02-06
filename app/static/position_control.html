@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#canvas {
+  position: relative;
+  display: inline-block;
+}
+
+#certImage {
+  width: 900px;
+}
+
+#nameOverlay {
+  position: absolute;
+  top: 300px;
+  left: 300px;
+  font-size: 48px;
+  font-weight: bold;
+  color: red;
+  cursor: move;
+  user-select: none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="canvas">
+  <!-- CHANGE cert.png to your uploaded template name -->
+  <img id="certImage" src="/uploads/templates/certificate.png">
+  <div id="nameOverlay">Test User</div>
+</div>
+
+<br><br>
+<button onclick="savePosition()">Save Position</button>
+
+<script>
+const overlay = document.getElementById("nameOverlay")
+let dragging = false
+let offsetX, offsetY
+
+overlay.onmousedown = e => {
+  dragging = true
+  offsetX = e.offsetX
+  offsetY = e.offsetY
+}
+
+document.onmousemove = e => {
+  if (!dragging) return
+  overlay.style.left = (e.pageX - offsetX) + "px"
+  overlay.style.top = (e.pageY - offsetY) + "px"
+}
+
+document.onmouseup = () => dragging = false
+
+function savePosition() {
+  const img = document.getElementById("certImage")
+
+  const scaleX = img.naturalWidth / img.clientWidth
+  const scaleY = img.naturalHeight / img.clientHeight
+
+  const x = Math.round(overlay.offsetLeft * scaleX)
+  const y = Math.round(overlay.offsetTop * scaleY)
+
+  fetch("/save-position", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ x, y })
+  })
+
+  alert(`Saved: X=${x}, Y=${y}`)
+}
+</script>
+
+</body>
+</html>

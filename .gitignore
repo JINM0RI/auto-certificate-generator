@@ -15,3 +15,9 @@ output/
 credentials/
 .env
 
+# Uploaded & generated files
+app/uploads/
+app/generated_certificates/
+
+uploads
+generated
