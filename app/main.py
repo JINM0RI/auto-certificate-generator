@@ -1,9 +1,10 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 import shutil
 import os
 from pathlib import Path
+import random
+from fastapi.responses import FileResponse, JSONResponse
 
 from app.services.sheet_service import read_participants
 from app.services.certificate_service import generate_certificate
@@ -133,3 +134,23 @@ def generate_all(template_name: str):
         "count": len(participants),
         "download_url": "/generated/"
     }
+
+@app.get("/preview-generated")
+def preview_generated_certificate():
+    pdf_files = list(GENERATED_DIR.glob("*.pdf"))
+
+    if not pdf_files:
+        return JSONResponse(
+            status_code=404,
+            content={"error": "No certificates generated yet"}
+        )
+
+    preview_pdf = pdf_files[0]  # any one certificate
+
+    return FileResponse(
+        path=preview_pdf,
+        media_type="application/pdf",
+        filename=preview_pdf.name
+    )
+
+
