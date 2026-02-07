@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+  
+
 <style>
 #canvas {
   position: relative;
@@ -23,8 +25,10 @@
 }
 </style>
 </head>
+ <h1 style="color:red;">POSITION EDITOR LOADED</h1>
 
 <body>
+ 
 
 <div id="canvas">
   <!-- CHANGE cert.png to your uploaded template name -->
@@ -36,42 +40,43 @@
 <button onclick="savePosition()">Save Position</button>
 
 <script>
-const overlay = document.getElementById("nameOverlay")
-let dragging = false
-let offsetX, offsetY
+const overlay = document.getElementById("nameOverlay");
+let dragging = false;
+let offsetX = 0, offsetY = 0;
 
 overlay.onmousedown = e => {
-  dragging = true
-  offsetX = e.offsetX
-  offsetY = e.offsetY
-}
+  dragging = true;
+  offsetX = e.offsetX;
+  offsetY = e.offsetY;
+};
 
 document.onmousemove = e => {
-  if (!dragging) return
-  overlay.style.left = (e.pageX - offsetX) + "px"
-  overlay.style.top = (e.pageY - offsetY) + "px"
-}
+  if (!dragging) return;
+  overlay.style.left = (e.pageX - offsetX) + "px";
+  overlay.style.top  = (e.pageY - offsetY) + "px";
+};
 
-document.onmouseup = () => dragging = false
+document.onmouseup = () => dragging = false;
 
 function savePosition() {
-  const img = document.getElementById("certImage")
+    const x = overlay.offsetLeft;
+    const y = overlay.offsetTop;
 
-  const scaleX = img.naturalWidth / img.clientWidth
-  const scaleY = img.naturalHeight / img.clientHeight
-
-  const x = Math.round(overlay.offsetLeft * scaleX)
-  const y = Math.round(overlay.offsetTop * scaleY)
-
-  fetch("/save-position", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ x, y })
-  })
-
-  alert(`Saved: X=${x}, Y=${y}`)
+    fetch("/save-position", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ x, y })
+    })
+    .then(res => res.json())
+    .then(() => {
+        alert("Position saved");
+        window.close(); // ✅ NOW THIS WILL WORK
+    });
 }
+
+console.log("Opened by JS:", window.opener !== null);
 </script>
+
 
 </body>
 </html>

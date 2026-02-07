@@ -2,3 +2,4 @@ gspread
 oauth2client
 pillow
 reportlab
+python-dotenv

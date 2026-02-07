@@ -21,3 +21,8 @@ app/generated_certificates/
 
 uploads
 generated
+
+.env
+__pycache__/
+uploads/
+generated_certificates/

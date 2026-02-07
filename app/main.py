@@ -5,9 +5,17 @@ import os
 from pathlib import Path
 import random
 from fastapi.responses import FileResponse, JSONResponse
+from app.services.email_service import send_certificates
+from fastapi import Body
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
 
 from app.services.sheet_service import read_participants
 from app.services.certificate_service import generate_certificate
+from fastapi.staticfiles import StaticFiles
+
+
+
 
 app = FastAPI()
 
@@ -42,7 +50,7 @@ app.mount(
     StaticFiles(directory=GENERATED_DIR),
     name="generated"
 )
-
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 # ---------- GLOBAL POSITION STORE ----------
 position_config = {
     "x": 300,
@@ -77,21 +85,21 @@ async def upload_template(file: UploadFile = File(...)):
     }
 
 
-@app.post("/preview")
-def preview(name: str, template_name: str):
-    template_path = TEMPLATE_DIR / template_name
-    preview_path = UPLOADS_DIR / "preview.jpg"
+# @app.post("/preview")
+# def preview(name: str, template_name: str):
+#     template_path = TEMPLATE_DIR / template_name
+#     preview_path = UPLOADS_DIR / "preview.jpg"
 
-    generate_certificate(
-        name=name,
-        template_path=template_path,
-        output_path=preview_path,
-        x=position_config["x"],
-        y=position_config["y"],
-        font_size=position_config["font_size"]
-    )
+#     generate_certificate(
+#         name=name,
+#         template_path=template_path,
+#         output_path=preview_path,
+#         x=position_config["x"],
+#         y=position_config["y"],
+#         font_size=position_config["font_size"]
+#     )
 
-    return FileResponse(preview_path)
+#     return FileResponse(preview_path)
 
 
 @app.post("/save-position")
@@ -154,3 +162,40 @@ def preview_generated_certificate():
     )
 
 
+@app.post("/send-emails")
+def send_emails(
+    subject: str = Body(...),
+    body: str = Body(...)
+):
+    sheet_files = list(SHEET_DIR.glob("*"))
+
+    if not sheet_files:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "No participant sheet uploaded"}
+        )
+
+    participants = read_participants(sheet_files[-1])
+
+    send_certificates(
+        participants=participants,
+        subject=subject,
+        body=body,
+        certificates_dir=GENERATED_DIR
+    )
+
+    return {
+        "message": "Emails sent successfully",
+        "count": len(participants)
+    }
+
+
+templates = Jinja2Templates(directory=BASE_DIR / "templates")
+
+
+@app.get("/")
+def home(request: Request):
+    return templates.TemplateResponse(
+        "index.html",
+        {"request": request}
+    )

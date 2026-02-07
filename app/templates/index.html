@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auto Certificate Generator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h2>Auto Certificate Generator</h2>
+
+<!-- Upload Sheet -->
+<h3>1. Upload Participant Sheet</h3>
+<input type="file" id="sheetFile">
+
+<!-- Upload Template -->
+<h3>2. Upload Certificate Template</h3>
+<input type="file" id="templateFile">
+
+<!-- Position Control -->
+<h3>3. Adjust Name Position</h3>
+<button id="openEditorBtn" onclick="openPositionEditor()" disabled>
+    Open Position Editor
+</button>
+
+
+<!-- Generate -->
+<h3>4. Generate Certificates</h3>
+<button onclick="generateCertificates()">Generate</button>
+
+<!-- Preview -->
+<h3>5. Preview Generated Certificate</h3>
+<a href="/preview-generated" target="_blank">Preview PDF</a>
+
+<!-- Email -->
+<h3>6. Send Emails</h3>
+<input type="text" id="subject" placeholder="Email Subject"><br><br>
+<textarea id="body" rows="6" cols="50"
+placeholder="Email Body (use {name})"></textarea><br><br>
+<button onclick="sendEmails()">Send Emails</button>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
