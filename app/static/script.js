@@ -66,20 +66,37 @@ async function generateCertificates() {
 
 
 // ---------- SEND EMAILS ----------
+
 async function sendEmails() {
-    const subject = document.getElementById("subject").value.trim();
-    const body = document.getElementById("body").value.trim();
+    const subject = document.getElementById("subject").value;
+    const body = document.getElementById("body").value;
 
-    if (!subject || !body) {
-        alert("Subject and body are required");
-        return;
-    }
-
-    await fetch("/send-emails", {
+    const res = await fetch("/send-emails", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({ subject, body })
     });
 
-    alert("Emails sent");
+    const data = await res.json();
+
+    if (!res.ok) {
+        alert("Email sending failed: " + data.error);
+        return;
+    }
+
+    
+    await fetch("/reset", {
+        method: "POST"
+    });
+
+    alert("Emails sent & system reset");
+
+    // Optional UI cleanup
+    document.getElementById("sheetFile").value = "";
+    document.getElementById("templateFile").value = "";
+    document.getElementById("subject").value = "";
+    document.getElementById("body").value = "";
 }
+

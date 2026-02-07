@@ -24,5 +24,13 @@ generated
 
 .env
 __pycache__/
+
 uploads/
 generated_certificates/
+__pycache__/
+.env
+*.xlsx
+*.pdf
+# OS
+.DS_Store
+Thumbs.db

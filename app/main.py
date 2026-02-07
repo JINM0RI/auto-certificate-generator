@@ -85,22 +85,6 @@ async def upload_template(file: UploadFile = File(...)):
     }
 
 
-# @app.post("/preview")
-# def preview(name: str, template_name: str):
-#     template_path = TEMPLATE_DIR / template_name
-#     preview_path = UPLOADS_DIR / "preview.jpg"
-
-#     generate_certificate(
-#         name=name,
-#         template_path=template_path,
-#         output_path=preview_path,
-#         x=position_config["x"],
-#         y=position_config["y"],
-#         font_size=position_config["font_size"]
-#     )
-
-#     return FileResponse(preview_path)
-
 
 @app.post("/save-position")
 def save_position(data: dict):
@@ -184,10 +168,16 @@ def send_emails(
         certificates_dir=GENERATED_DIR
     )
 
+    # AUTO RESET AFTER SUCCESS
+    for folder in [TEMPLATE_DIR, SHEET_DIR, GENERATED_DIR]:
+        for file in folder.iterdir():
+            file.unlink()
+
     return {
-        "message": "Emails sent successfully",
+        "message": "Emails sent & system reset",
         "count": len(participants)
     }
+
 
 
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
@@ -199,3 +189,25 @@ def home(request: Request):
         "index.html",
         {"request": request}
     )
+
+@app.post("/reset")
+def reset_app_state():
+    global position_config
+
+    # Reset position
+    position_config = {
+        "x": 300,
+        "y": 300,
+        "font_size": 48
+    }
+
+    # Clear uploaded templates & sheets
+    for folder in [TEMPLATE_DIR, SHEET_DIR]:
+        for file in folder.iterdir():
+            file.unlink()
+
+    # Clear generated certificates (PDFs)
+    for file in GENERATED_DIR.iterdir():
+        file.unlink()
+
+    return {"status": "reset_complete"}
