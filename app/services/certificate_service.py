@@ -1,18 +1,14 @@
 from PIL import Image, ImageDraw, ImageFont
-import os
+from pathlib import Path
 
-def generate_certificate(
-    name: str,
-    template_path: str,
-    output_path: str,
-    x: int,
-    y: int,
-    font_size: int
-):
+BASE_DIR = Path(__file__).resolve().parent.parent
+FONT_PATH = BASE_DIR / "fonts" / "Poppins-Bold.ttf"
+
+def generate_certificate(name, template_path, output_path, x, y, font_size):
     image = Image.open(template_path).convert("RGB")
     draw = ImageDraw.Draw(image)
 
-    font = ImageFont.truetype("fonts/Poppins-Bold.ttf", font_size)
+    font = ImageFont.truetype(str(FONT_PATH), font_size)
 
     draw.text((x, y), name, fill="black", font=font)
 
