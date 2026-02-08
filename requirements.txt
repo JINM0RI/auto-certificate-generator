@@ -1,5 +1,18 @@
-gspread
-oauth2client
-pillow
+fastapi
+uvicorn[standard]
+python-multipart
+jinja2
+
+# Certificate & PDF generation
+Pillow
 reportlab
+
+# Excel / Sheet handling
+openpyxl
+pandas
+
+# Email support
+email-validator
+
+# Utilities
 python-dotenv
