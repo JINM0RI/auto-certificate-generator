@@ -1,49 +1,28 @@
 import os
-import smtplib
-from email.message import EmailMessage
+import requests
 from pathlib import Path
-from dotenv import load_dotenv
 
-# Load .env variables
-load_dotenv()
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 
-EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+def send_certificates(participants, subject, body, certificates_dir):
+    for p in participants:
+        cert_path = Path(certificates_dir) / f"{p['name']}.pdf"
 
+        with open(cert_path, "rb") as f:
+            response = requests.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {RESEND_API_KEY}"
+                },
+                files={
+                    "attachments[0]": f
+                },
+                data={
+                    "from": "Certificates <onboarding@resend.dev>",
+                    "to": p["email"],
+                    "subject": subject,
+                    "html": body
+                }
+            )
 
-def send_certificates(participants, subject, body, certificates_dir: Path):
-    if not EMAIL_ADDRESS or not EMAIL_PASSWORD:
-        raise ValueError("Email credentials not set in .env")
-
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-
-        for p in participants:
-            name = p["name"]
-            email = p["email"]
-
-            pdf_path = certificates_dir / f"{name.replace(' ', '_')}.pdf"
-
-            if not pdf_path.exists():
-                print(f"⚠️ Certificate missing for {name}")
-                continue
-
-            msg = EmailMessage()
-            msg["From"] = EMAIL_ADDRESS
-            msg["To"] = email
-            msg["Subject"] = subject
-
-            personalized_body = body.replace("{name}", name)
-            msg.set_content(personalized_body)
-
-            with open(pdf_path, "rb") as f:
-                msg.add_attachment(
-                    f.read(),
-                    maintype="application",
-                    subtype="pdf",
-                    filename=pdf_path.name
-                )
-
-            server.send_message(msg)
-
-    return True
+        response.raise_for_status()
